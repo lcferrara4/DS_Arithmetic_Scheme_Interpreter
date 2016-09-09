@@ -8,6 +8,11 @@
 
 using namespace std;
 
+// Globals ---------------------------------------------------------------------
+
+bool BATCH = false;
+bool DEBUG = false;
+
 // Structures ------------------------------------------------------------------
 
 struct Node {
@@ -49,19 +54,22 @@ int evaluate(const Node *n) {
 
 int main(int argc, char *argv[]) {
     string line;
-    bool batch = false;
-    bool debug = false;
     int c;
 
-    while ((c = getopt(argc, argv, "bd")) != -1) {
+    while ((c = getopt(argc, argv, "bdh")) != -1) {
         switch (c) {
-            case 'b': batch = true; break;
-            case 'd': debug = true; break;
+            case 'b': BATCH = true; break;
+            case 'd': DEBUG = true; break;
+            default:
+                cerr << "usage: " << argv[0] << endl;
+                cerr << "    -b Batch mode (disable prompt)"   << endl;
+                cerr << "    -d Debug mode (display messages)" << endl;
+                return 1;
         }
     }
 
     while (!cin.eof()) {
-        if (!batch) {
+        if (!BATCH) {
             cout << ">>> ";
             cout.flush();
         }
@@ -70,11 +78,11 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        if (debug) { cout << "LINE: " << line << endl; }
+        if (DEBUG) { cout << "LINE: " << line << endl; }
 
         stringstream s(line);
         Node *n = parse_expression(s);
-        if (debug) { cout << "TREE: " << *n << endl; }
+        if (DEBUG) { cout << "TREE: " << *n << endl; }
 
         cout << evaluate(n) << endl;
 
