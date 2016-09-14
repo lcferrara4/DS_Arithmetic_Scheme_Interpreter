@@ -21,16 +21,18 @@ struct Node {
     Node * left;
     Node * right;
 
-  Node(string i_value, Node *i_left = nullptr, Node *i_right = nullptr){
+    Node(string i_value, Node *i_left = nullptr, Node *i_right = nullptr){
         value = i_value; 
         left = i_left; 
         right = i_right; 
         
     } //constructor 
+
     ~Node(){
-    //    delete left;
-    //    delete right; 
-    }
+        delete left;
+        delete right; 
+    } // destructor
+
     friend ostream &operator<<(ostream &os, const Node &n); 
 };
 
@@ -40,18 +42,14 @@ ostream &operator<<(ostream &os, const Node &n) {
     
     if( n.left != nullptr){
         os << ", left=";
-        //&operator<< (os, *(n.left));
         os << *(n.left);
-        // return (os << *(n.left));
     }
     if( n.right != nullptr){
         os << ", right=";
-        //&operator<< (os, *(n.right));
-        //return (os << *(n.right));
+        os << *(n.right);
     }
-    else{
-        os << ")";
-    }
+
+    os << ")";
 
     return os;
 }
@@ -79,8 +77,9 @@ string parse_token(istream &s) {
 
 Node *parse_expression(istream &s) {
 
-    struct Node * left;
-    struct Node * right; 
+    Node* left = nullptr;
+    Node* right= nullptr;
+    
     string token = parse_token(s); 
     cout<<"parsing expression"<<endl; 
     if (token == "" || token == ")"){
@@ -104,9 +103,21 @@ Node *parse_expression(istream &s) {
 // Interpreter -----------------------------------------------------------------
 
 void evaluate_r(const Node *n, stack<int> &s) {
+    if( isdigit(n.value) ){
+        s.push(stoi(n.value));
+    }
+    else{
+        int t1 = s.pop();
+        int t2 = s.pop();
+        //case n.value
+
+
+    }
 }
 
 int evaluate(const Node *n) {
+    stack<int> s;
+    evaluate_r(n, s);
     return 0;
 }
 
