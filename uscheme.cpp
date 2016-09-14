@@ -16,18 +16,17 @@ bool DEBUG = false;
 // Structures ------------------------------------------------------------------
 
 struct Node {
-    Node(string value, Node *left=nullptr, Node *right=nullptr){
-        value = value; 
-        left = left; 
-        right = right; 
+   Node(string i_value, Node *i_left = nullptr, Node *i_right = nullptr){
+        value = i_value; 
+        left = i_left; 
+        right = i_right; 
         
     } //constructor 
     ~Node(){
-        delete [] left;
-        delete [] right; 
-
+        delete left;
+        delete right; 
     }
-
+ 
     string value;
     Node * left;
     Node * right;
@@ -38,14 +37,14 @@ struct Node {
 ostream &operator<<(ostream &os, const Node &n) {
   
     
-    if((n.left)!= nullptr && (n.right) != nullptr){
-        os<<"(Node: value="<< n.value <<", left="<<(os << *(n.left))<<", right="<<(os << *(n.right))<<")"; 
+    if( n.left != nullptr && n.right != nullptr){
+            os<<"(Node: value="<< n.value <<", left="<<(os << *(n.left))<<", right="<<(os << *(n.right))<<")"; 
         }
-        else{
-            os<<"(Node: value="<<n.value<<")";  
-        }
+    else{
+            cout << "something is nullptr" << endl;
+         //   os<<"(Node: value="<<n.value<<")";  
+      }
     
-
     return os;
 }
 
@@ -92,7 +91,6 @@ Node *parse_expression(istream &s) {
             parse_token(s); 
         }
     }
-
     return new Node(token, left, right);
 }
 
