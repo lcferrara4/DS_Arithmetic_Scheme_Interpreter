@@ -16,35 +16,43 @@ bool DEBUG = false;
 // Structures ------------------------------------------------------------------
 
 struct Node {
-   Node(string i_value, Node *i_left = nullptr, Node *i_right = nullptr){
+  
+    string value;
+    Node * left;
+    Node * right;
+
+  Node(string i_value, Node *i_left = nullptr, Node *i_right = nullptr){
         value = i_value; 
         left = i_left; 
         right = i_right; 
         
     } //constructor 
     ~Node(){
-        delete left;
-        delete right; 
+    //    delete left;
+    //    delete right; 
     }
- 
-    string value;
-    Node * left;
-    Node * right;
-
     friend ostream &operator<<(ostream &os, const Node &n); 
 };
 
 ostream &operator<<(ostream &os, const Node &n) {
-  
+   
+    os << "(Node: value=" << n.value;
     
-    if( n.left != nullptr && n.right != nullptr){
-            os<<"(Node: value="<< n.value <<", left="<<(os << *(n.left))<<", right="<<(os << *(n.right))<<")"; 
-        }
+    if( n.left != nullptr){
+        os << ", left=";
+        //&operator<< (os, *(n.left));
+        os << *(n.left);
+        // return (os << *(n.left));
+    }
+    if( n.right != nullptr){
+        os << ", right=";
+        //&operator<< (os, *(n.right));
+        //return (os << *(n.right));
+    }
     else{
-            cout << "something is nullptr" << endl;
-         //   os<<"(Node: value="<<n.value<<")";  
-      }
-    
+        os << ")";
+    }
+
     return os;
 }
 
@@ -54,12 +62,11 @@ string parse_token(istream &s) {
     string token= ""; 
     cout<<"parsing token"<<endl; 
     while(s.peek() == ' ' && s.peek() != EOF){
-        cout<<"peek:"<<s.peek()<<endl; 
-        cout<<"get: "<<s.get()<<endl; ;    
+        s.get();    
     }
     
     if( !isalnum(s.peek())){
-        token = s.get(); 
+        token = s.get();
     }
     else if(isdigit(s.peek())){
         while(isdigit(s.peek())){ //s.peek() != ' ' && s.peek() != -1){
