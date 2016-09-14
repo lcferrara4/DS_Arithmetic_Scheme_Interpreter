@@ -16,28 +16,83 @@ bool DEBUG = false;
 // Structures ------------------------------------------------------------------
 
 struct Node {
-    Node(string value, Node *left=nullptr, Node *right=nullptr);
-    ~Node();
+    Node(string value, Node *left=nullptr, Node *right=nullptr){
+        value = value; 
+        left = left; 
+        right = right; 
+        
+    } //constructor 
+    ~Node(){
+        delete [] left;
+        delete [] right; 
+
+    }
 
     string value;
     Node * left;
     Node * right;
 
-    friend ostream &operator<<(ostream &os, const Node &n);
+    friend ostream &operator<<(ostream &os, const Node &n); 
 };
 
 ostream &operator<<(ostream &os, const Node &n) {
+  
+    
+    if((n.left)!= nullptr && (n.right) != nullptr){
+        os<<"(Node: value="<< n.value <<", left="<<(os << *(n.left))<<", right="<<(os << *(n.right))<<")"; 
+        }
+        else{
+            os<<"(Node: value="<<n.value<<")";  
+        }
+    
+
     return os;
 }
 
 // Parser ----------------------------------------------------------------------
 
 string parse_token(istream &s) {
-    string token;
+    string token= ""; 
+    cout<<"parsing token"<<endl; 
+    while(s.peek() == ' ' && s.peek() != EOF){
+        cout<<"peek:"<<s.peek()<<endl; 
+        cout<<"get: "<<s.get()<<endl; ;    
+    }
+    
+    if( !isalnum(s.peek())){
+        token = s.get(); 
+    }
+    else if(isdigit(s.peek())){
+        while(isdigit(s.peek())){ //s.peek() != ' ' && s.peek() != -1){
+            token += s.get(); 
+        }
+    }
+    
     return token;
 }
 
 Node *parse_expression(istream &s) {
+
+    struct Node * left;
+    struct Node * right; 
+    string token = parse_token(s); 
+    cout<<"parsing expression"<<endl; 
+    if (token == "" || token == ")"){
+        cout<<"end"<<endl; 
+        return nullptr; 
+    }
+
+    if (token == "("){
+        token = parse_token(s); 
+        left = parse_expression(s); 
+        if (left){
+            right = parse_expression(s); 
+        }
+        if (right){
+            parse_token(s); 
+        }
+    }
+
     return new Node(token, left, right);
 }
 
