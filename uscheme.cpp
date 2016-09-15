@@ -58,7 +58,7 @@ ostream &operator<<(ostream &os, const Node &n) {
 
 string parse_token(istream &s) {
     string token= ""; 
-    cout<<"parsing token"<<endl; 
+    if (DEBUG){ cout<<"parsing token"<<endl; }
     while(s.peek() == ' ' && s.peek() != EOF){
         s.get();    
     }
@@ -81,7 +81,7 @@ Node *parse_expression(istream &s) {
     Node* right= nullptr;
     
     string token = parse_token(s); 
-    cout<<"parsing expression"<<endl; 
+    if (DEBUG){ cout<<"parsing expression"<<endl; }
     if (token == "" || token == ")"){
         cout<<"end"<<endl; 
         return nullptr; 

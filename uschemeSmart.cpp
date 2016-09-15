@@ -1,10 +1,11 @@
-// uschemeSmart.cpp
+// uscheme.cpp
 
 #include <iostream>
 #include <sstream>
 #include <stack>
 #include <string>
 #include <unistd.h>
+#include <memory>
 
 using namespace std;
 
@@ -16,38 +17,150 @@ bool DEBUG = false;
 // Structures ------------------------------------------------------------------
 
 struct Node {
-    Node(string value, Node *left=nullptr, Node *right=nullptr);
-    ~Node();
-
+  
     string value;
-    Node * left;
-    Node * right;
-
-    friend ostream &operator<<(ostream &os, const Node &n);
+    shared_ptr<Node> left;
+    shared_ptr<Node> right;
+/*
+    Node(string i_value, shared_ptr<Node> i_left = nullptr, shared_ptr<Node> i_right = nullptr){
+        value = i_value; 
+        left = i_left; 
+        right = i_right; 
+        
+    } //constructor 
+    
+    ~Node(){
+        delete left;
+        delete right; 
+    } // destructor
+    */
+    friend ostream &operator<<(ostream &os, const shared_ptr<Node> n); 
 };
 
-ostream &operator<<(ostream &os, const Node &n) {
+ostream &operator<<(ostream &os, const shared_ptr<Node> n) {
+   
+    os << "(Node: value=" << n->value;
+    
+    if( n->left != nullptr){
+        os << ", left=";
+        os << n->left;
+    }
+    if( n->right != nullptr){
+        os << ", right=";
+        os << n->right;
+    }
+
+    os << ")";
+
     return os;
 }
 
 // Parser ----------------------------------------------------------------------
 
 string parse_token(istream &s) {
-    string token;
+    string token= ""; 
+    if (DEBUG){ cout<<"parsing token"<<endl; }
+    while(s.peek() == ' ' && s.peek() != EOF){
+        s.get();    
+    }
+    
+    if( !isalnum(s.peek())){
+        token = s.get();
+    }
+    else if(isdigit(s.peek())){
+        while(isdigit(s.peek())){ //s.peek() != ' ' && s.peek() != -1){
+            token += s.get(); 
+        }
+    }
+    
     return token;
 }
 
-Node *parse_expression(istream &s) {
-    return new Node(token, left, right);
+shared_ptr<Node> parse_expression(istream &s) {
+
+    shared_ptr<Node> left = nullptr;
+    shared_ptr<Node> right= nullptr;
+    
+    string token = parse_token(s); 
+    if (DEBUG){ cout<<"parsing expression"<<endl; }
+    if (token == "" || token == ")"){
+        cout<<"end"<<endl; 
+        return nullptr; 
+    }
+
+    if (token == "("){
+        token = parse_token(s); 
+        left = parse_expression(s); 
+        if (left){
+            right = parse_expression(s); 
+        }
+        if (right){
+            parse_token(s); 
+        }
+    }
+    shared_ptr<Node> result;
+    result->value = token;
+    result->left = left;
+    result->right = right;
+    return result;
+    //return make_shared<Node>(new Node(token, left, right));
 }
 
 // Interpreter -----------------------------------------------------------------
 
-void evaluate_r(const Node *n, stack<int> &s) {
+void evaluate_r(const shared_ptr<Node> n, stack<int> &s) {
+    int t1;
+    int t2;   
+    
+    if( isdigit((n->value)[0]) ){
+        s.push(stoi(n->value));
+    }
+    else{
+        switch ( (n->value)[0] ){
+            case '+':
+                evaluate_r(n->right, s);
+                evaluate_r(n->left, s);
+                t1 = s.top();
+                s.pop();
+                t2 = s.top();
+                s.pop();
+                s.push(t1+t2);
+                break;
+            case '-':
+                evaluate_r(n->right, s);
+                evaluate_r(n->left, s); 
+                t1 = s.top();
+                s.pop();
+                t2 = s.top();
+                s.pop();
+                s.push(t1-t2);
+                break;
+            case '*':
+                evaluate_r(n->right, s);
+                evaluate_r(n->left, s); 
+                t1 = s.top();
+                s.pop();
+                t2 = s.top();
+                s.pop();
+                s.push(t1*t2);
+                break;
+            case '/':
+                evaluate_r(n->right, s);
+                evaluate_r(n->left, s); 
+                t1 = s.top();
+                s.pop();
+                t2 = s.top();
+                s.pop();
+                s.push(t1/t2);
+                break;
+        }
+    }
 }
 
-int evaluate(const Node *n) {
-    return 0;
+int evaluate(const shared_ptr<Node> n) {
+    stack<int> s;
+    evaluate_r(n, s);
+    return s.top();
 }
 
 // Main execution --------------------------------------------------------------
@@ -81,12 +194,12 @@ int main(int argc, char *argv[]) {
         if (DEBUG) { cout << "LINE: " << line << endl; }
 
         stringstream s(line);
-        Node *n = parse_expression(s);
-        if (DEBUG) { cout << "TREE: " << *n << endl; }
+        shared_ptr<Node> n = parse_expression(s);
+        if (DEBUG) { cout << "TREE: " << n << endl; }
 
         cout << evaluate(n) << endl;
 
-        delete n;
+        //delete n;
     }
 
     return 0;
