@@ -103,72 +103,58 @@ Node *parse_expression(istream &s) {
 // Interpreter -----------------------------------------------------------------
 
 void evaluate_r(const Node *n, stack<int> &s) {
+    int t1;
+    int t2;   
+    
     if( isdigit((n->value)[0]) ){
         s.push(stoi(n->value));
     }
     else{
-        if(!s.empty()){
-            int t1 = s.top();
-            s.pop();
-            int t2 = s.top();
-            s.pop();
-            switch ( (n->value)[0] ){
-                case '+':
-                    s.push(t1+t2);
-                    break;
-                case '-':
-                    s.push(t1-t2);
-                    break;
-                case '*':
-                    s.push(t1*t2);
-                    break;
-                case '/':
-                    s.push(t1/t2);
+        switch ( (n->value)[0] ){
+            case '+':
+                evaluate_r(n->right, s);
+                evaluate_r(n->left, s);
+                t1 = s.top();
+                s.pop();
+                t2 = s.top();
+                s.pop();
+                s.push(t1+t2);
                 break;
-            }
+            case '-':
+                evaluate_r(n->right, s);
+                evaluate_r(n->left, s); 
+                t1 = s.top();
+                s.pop();
+                t2 = s.top();
+                s.pop();
+                s.push(t1-t2);
+                break;
+            case '*':
+                evaluate_r(n->right, s);
+                evaluate_r(n->left, s); 
+                t1 = s.top();
+                s.pop();
+                t2 = s.top();
+                s.pop();
+                s.push(t1*t2);
+                break;
+            case '/':
+                evaluate_r(n->right, s);
+                evaluate_r(n->left, s); 
+                t1 = s.top();
+                s.pop();
+                t2 = s.top();
+                s.pop();
+                s.push(t1/t2);
+                break;
         }
-
     }
 }
 
 int evaluate(const Node *n) {
     stack<int> s;
-
-    stack<Node*> parents; 
-   
-    Node* current = new Node(n->value, n->left, n->right);
-    
-    //loop
-    //while( current->right != nullptr ){
-        while( current->right != nullptr ){
-            parents.push(current);
-            current = current->right;
-    cout << current->value << endl;
-        }
-
-        evaluate_r(current, s);
-        current = parents.top();
-    while( current->left != nullptr ){
-    //}
-        current = parents.top()->left;
-    cout << current->value << endl;
-    //loop 
-        while( current->right != nullptr ){
-         parents.push(current);
-            current = current->right;
-    cout << current->value << endl;
-        }   
-    evaluate_r(current, s);
-    current = parents.top();
-    parents.pop();
-    }
-    evaluate_r(current, s);
-    cout << current->value << endl;
-    //loop to go right
-
-    //evaluate_r(n, s);
-    cout << s.top() << endl;
-    return 0;
+    evaluate_r(n, s);
+    return s.top();
 }
 
 // Main execution --------------------------------------------------------------
