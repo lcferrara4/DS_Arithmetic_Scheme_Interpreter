@@ -134,41 +134,28 @@ void evaluate_r(const Node *n, stack<int> &s) {
 int evaluate(const Node *n) {
     stack<int> s;
 
-    stack<Node*> parents; 
+    stack<Node> parents; 
    
     Node* current = new Node(n->value, n->left, n->right);
     
-    //loop
-    //while( current->right != nullptr ){
-        while( current->right != nullptr ){
-            parents.push(current);
-            current = current->right;
-    cout << current->value << endl;
-        }
-
-        evaluate_r(current, s);
-        current = parents.top();
-    while( current->left != nullptr ){
-    //}
-        current = parents.top()->left;
-    cout << current->value << endl;
-    //loop 
-        while( current->right != nullptr ){
-         parents.push(current);
-            current = current->right;
-    cout << current->value << endl;
-        }   
-    evaluate_r(current, s);
-    current = parents.top();
-    parents.pop();
+    while( current->right != nullptr ){
+        parents.push(current);
+        current = current->right;
     }
-    evaluate_r(current, s);
-    cout << current->value << endl;
-    //loop to go right
-
-    //evaluate_r(n, s);
+    /*
+        evaluate_r(current, s);
+        current = parents.top()->left;
+        evaluate_r(current, s);
+        evaluate_r(parents.top(), s);
+        current 
+    } 
+    */
+    cout << parents.top() << endl;
     cout << s.top() << endl;
+    cout << current->value << endl;
     return 0;
+    //evaluate_r(n, s);
+    //return 0;
 }
 
 // Main execution --------------------------------------------------------------
