@@ -21,7 +21,7 @@ struct Node {
     string value;
     shared_ptr<Node> left;
     shared_ptr<Node> right;
-/*
+    
     Node(string i_value, shared_ptr<Node> i_left = nullptr, shared_ptr<Node> i_right = nullptr){
         value = i_value; 
         left = i_left; 
@@ -29,15 +29,10 @@ struct Node {
         
     } //constructor 
     
-    ~Node(){
-        delete left;
-        delete right; 
-    } // destructor
-    */
-    friend ostream &operator<<(ostream &os, const shared_ptr<Node> n); 
+    friend ostream &operator<<(ostream &os, shared_ptr<Node> n); 
 };
 
-ostream &operator<<(ostream &os, const shared_ptr<Node> n) {
+ostream &operator<<(ostream &os, shared_ptr<Node> n) {
    
     os << "(Node: value=" << n->value;
     
@@ -59,7 +54,6 @@ ostream &operator<<(ostream &os, const shared_ptr<Node> n) {
 
 string parse_token(istream &s) {
     string token= ""; 
-    if (DEBUG){ cout<<"parsing token"<<endl; }
     while(s.peek() == ' ' && s.peek() != EOF){
         s.get();    
     }
@@ -68,7 +62,7 @@ string parse_token(istream &s) {
         token = s.get();
     }
     else if(isdigit(s.peek())){
-        while(isdigit(s.peek())){ //s.peek() != ' ' && s.peek() != -1){
+        while(isdigit(s.peek())){
             token += s.get(); 
         }
     }
@@ -82,9 +76,7 @@ shared_ptr<Node> parse_expression(istream &s) {
     shared_ptr<Node> right= nullptr;
     
     string token = parse_token(s); 
-    if (DEBUG){ cout<<"parsing expression"<<endl; }
     if (token == "" || token == ")"){
-        cout<<"end"<<endl; 
         return nullptr; 
     }
 
@@ -98,12 +90,8 @@ shared_ptr<Node> parse_expression(istream &s) {
             parse_token(s); 
         }
     }
-    shared_ptr<Node> result;
-    result->value = token;
-    result->left = left;
-    result->right = right;
-    return result;
-    //return make_shared<Node>(new Node(token, left, right));
+
+    return shared_ptr<Node>(new Node(token, left, right));
 }
 
 // Interpreter -----------------------------------------------------------------
@@ -198,8 +186,6 @@ int main(int argc, char *argv[]) {
         if (DEBUG) { cout << "TREE: " << n << endl; }
 
         cout << evaluate(n) << endl;
-
-        //delete n;
     }
 
     return 0;
